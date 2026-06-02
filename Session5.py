@@ -1,46 +1,77 @@
-def writing_module(m1, t1):
-    writing_average = round((m1 * 0.6 + t1 * 0.4), 2)
-    return writing_average
-def coef2_modules(t2, m3, t3, m4, t4, t5, m6, t6, m7):
-    coef2_average = round((t2 + m3 * 0.6 + t3 * 0.4 + m4 * 0.6 + t4 * 0.4 + t5 + m6 * 0.6 + t6 * 0.4 + m7) / 6, 2)
-    return coef2_average
-def coef1_modules(m8, m9):
-    coef1_average = round((m8 + m9) / 2, 2)
-    return coef1_average
+def get_mark_60_40(subject):
+    exam = float(input(f"  {subject} exam mark: "))
+    test = float(input(f"  {subject} test mark: "))
+    return round(exam * 0.6 + test * 0.4, 2)
 
-student_name = input("Enter the student's name: ")
-m1, t1 = float(input("Writing exam mark: ")), float(input("Writing test mark: "))
-t2 = float(input("Computer programming test mark: "))
-m3, t3 = float(input("TLS exam mark: ")), float(input("TLS test mark: "))
-m4, t4 = float(input("LTAL exam mark: ")), float(input("LTAL test mark: "))
-t5 = float(input("Research methods test mark: "))
-m6, t6 = float(input("Assessing English exam mark: ")), float(input("Assessing English test mark: "))
-m7 = float(input("Textbooks description exam mark: "))
-m8 = float(input("Discourse analysis exam mark: "))
-m9 = float(input("Educational psychology exam mark: "))
+def get_test_only(subject):
+    return float(input(f"  {subject} test mark: "))
 
-marks = [m1, t1, t2, m3, t3, m4, t4, t5, m6, t6, m7, m8, m9]
-if any(mark < 0 or mark > 20 for mark in marks):
-    print("Invalid mark detected. Please ensure all marks are between 0 and 20.")
-    exit()
+def get_exam_only(subject):
+    return float(input(f"  {subject} exam mark: "))
 
-writing_average = writing_module(m1, t1)
-coef2_average = coef2_modules(t2, m3, t3, m4, t4, t5, m6, t6, m7)
-coef1_average = coef1_modules(m8, m9)
-print(f"\nWriting Module Average: {writing_average}")
-print(f"Coefficient 2 Modules Average: {coef2_average}")
-print(f"Coefficient 1 Modules Average: {coef1_average}")
+def get_grade(average):
+    if average >= 16:
+        return "Excellent"
+    elif average >= 14:
+        return "Very Good"
+    elif average >= 10:
+        return "Pass"
+    else:
+        return "Fail"
 
-final_average = round((writing_average * 3 + coef2_average * 2 + coef1_average) / 17, 2)
+def process_student():
+    name = input("Student name: ")
+    print("\nEnter marks:")
 
-if final_average >= 16:
-    final_grade = "Excellent"
-elif final_average >= 14:
-    final_grade = "Very Good"
-elif final_average >= 10:
-    final_grade = "Pass"
-else:
-    final_grade = "Fail"
-print(f"\nStudent Name: {student_name}")
-print(f"Final Average: {final_average}")
-print(f"Final Grade: {final_grade}")
+    # coef 3
+    writing   = get_mark_60_40("Academic Writing")
+
+    # coef 2
+    tls       = get_mark_60_40("TLS")
+    ltal      = get_mark_60_40("LTAL")
+    assessing = get_mark_60_40("Assessing English")
+    comp_prog = get_test_only("Computer Programming")
+    res_meth  = get_test_only("Research Methods")
+
+    # coef 1
+    textbooks  = get_exam_only("Textbooks Description")
+    discourse  = get_exam_only("Discourse Analysis")
+    ed_psych   = get_exam_only("Educational Psychology")
+
+    # weighted sum
+    weighted_sum = (
+        writing   * 3 +
+        tls       * 2 +
+        ltal      * 2 +
+        assessing * 2 +
+        comp_prog * 2 +
+        res_meth  * 2 +
+        textbooks * 2 +
+        discourse * 1 +
+        ed_psych  * 1
+    )
+
+    total_coef = 3 + 2 + 2 + 2 + 2 + 2 + 2 + 1 + 1  # = 17
+    final_average = round(weighted_sum / total_coef, 2)
+    grade = get_grade(final_average)
+
+    print(f"\n--- Results for {name} ---")
+    print(f"  Academic Writing:       {writing}/20")
+    print(f"  TLS:                    {tls}/20")
+    print(f"  LTAL:                   {ltal}/20")
+    print(f"  Assessing English:      {assessing}/20")
+    print(f"  Computer Programming:   {comp_prog}/20")
+    print(f"  Research Methods:       {res_meth}/20")
+    print(f"  Textbooks Description:  {textbooks}/20")
+    print(f"  Discourse Analysis:     {discourse}/20")
+    print(f"  Educational Psychology: {ed_psych}/20")
+    print(f"\n  Final Average: {final_average}/20 — {grade}")
+    return final_average >= 10
+num_students = int(input("Enter number of students: "))
+passed_count = 0
+for i in range(1, num_students + 1):
+    print(f"\n--- Student {i} ---")
+    if process_student():
+        passed_count += 1
+
+print(f"\nTotal passed: {passed_count}/{num_students}")
